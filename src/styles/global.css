@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    @apply m-0 p-0 antialiased;
+  }
+  body {
+    @apply bg-cream font-sans text-ink;
+  }
+  /* Hide blue tap highlight on touch devices */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer utilities {
+  /* Press feedback — apply via className="press" */
+  .press {
+    @apply transition-transform duration-100 active:scale-[0.97];
+  }
+  .hover-lift {
+    @apply transition-[transform,box-shadow] duration-300;
+  }
+  .hover-lift:hover {
+    @apply -translate-y-1 shadow-xl;
+  }
+  .link-underline {
+    position: relative;
+  }
+  .link-underline::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    width: 100%;
+    height: 1.5px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .link-underline:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .dot-dark-bg {
+    background-image: radial-gradient(circle, rgba(11, 93, 77, 0.08) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  .dot-light-bg {
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+  .dot-brass-bg {
+    background-image: radial-gradient(circle, rgba(200, 160, 77, 0.18) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+}
