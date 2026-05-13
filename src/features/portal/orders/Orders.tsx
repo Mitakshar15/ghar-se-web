@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Phone, Search, Clock, Info, CheckCircle2, Smartphone } from 'lucide-react';
+import { MessageCircle, Search, Clock, Info, CheckCircle2 } from 'lucide-react';
 
 import { PortalShell } from '@/components/layout/PortalShell';
 import { Card, CardHeader } from '@/components/ui/Card';
@@ -211,8 +211,14 @@ export function Orders() {
                         <div className="text-[14px] font-extrabold text-ink">{selected.buyer}</div>
                         <div className="text-[12px] text-ink-2">{selected.neighborhood}, Sirsi</div>
                       </div>
-                      <Button variant="outline" size="sm" leftIcon={<Phone className="size-3.5" strokeWidth={2.4} />}>
-                        Call
+                      {/* Buyer phone numbers are never exposed to makers. Chat happens in-app. */}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        leftIcon={<MessageCircle className="size-3.5" strokeWidth={2.4} />}
+                        onClick={() => push('Chat coming soon — buyer phone numbers are private')}
+                      >
+                        Chat
                       </Button>
                     </div>
                   </div>
@@ -281,10 +287,10 @@ export function Orders() {
                       <Button
                         variant="outline"
                         size="md"
-                        leftIcon={<Smartphone className="size-4" strokeWidth={2.4} />}
-                        onClick={() => push('Message sent to buyer')}
+                        leftIcon={<MessageCircle className="size-4" strokeWidth={2.4} />}
+                        onClick={() => push('Chat coming soon — buyer phone numbers are private')}
                       >
-                        Message
+                        Chat
                       </Button>
                       <Button
                         variant="saffron"
