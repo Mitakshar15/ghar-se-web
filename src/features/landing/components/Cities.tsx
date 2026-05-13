@@ -1,5 +1,10 @@
 import { MapPin } from 'lucide-react';
 
+import { citiesCopy } from '@/content/landing/cities-copy';
+import { localized } from '@/content';
+
+// Operational data: live + coming-soon city lists.
+// These stay in the component until /api/v1/public/cities lands.
 const LIVE = [{ name: 'Sirsi', sub: 'Headquarters', makers: 47 }];
 const SOON = [
   { name: 'Kumta', months: '3 months' },
@@ -10,20 +15,31 @@ const SOON = [
 ];
 
 export function Cities() {
+  // Headline may contain a newline placeholder; render literally with <br/>.
+  const headlineLines = localized(citiesCopy.headline).split('\n');
+
   return (
     <section id="cities" className="py-24 md:py-32" style={{ background: '#FFFFFF' }}>
       <div className="mx-auto max-w-page px-5 md:px-10">
         <div className="mb-10 text-center md:mb-14">
-          <div className="mb-4 text-[11px] font-extrabold tracking-[0.25em] text-saffron uppercase">Cities</div>
+          <div className="mb-4 text-[11px] font-extrabold tracking-[0.25em] text-saffron uppercase">
+            {localized(citiesCopy.eyebrow)}
+          </div>
           <h2 className="font-display text-[40px] leading-[1.05] font-black tracking-tight text-ink md:text-[60px]">
-            Starting hyperlocal. <br />
-            Scaling along Uttara Kannada.
+            {headlineLines.map((line, i) => (
+              <span key={i}>
+                {line}
+                {i < headlineLines.length - 1 && <br />}
+              </span>
+            ))}
           </h2>
         </div>
 
         <div className="grid gap-8 md:grid-cols-3">
           <div className="rounded-3xl bg-green p-8 text-white">
-            <div className="text-[10px] font-extrabold tracking-[0.18em] text-brass uppercase">Live</div>
+            <div className="text-[10px] font-extrabold tracking-[0.18em] text-brass uppercase">
+              {localized(citiesCopy.liveSectionLabel)}
+            </div>
             {LIVE.map((c) => (
               <div key={c.name} className="mt-3">
                 <div className="font-display text-[48px] leading-none font-black tracking-tight">{c.name}</div>
@@ -37,7 +53,9 @@ export function Cities() {
           </div>
 
           <div className="space-y-4 md:col-span-2">
-            <div className="text-[10px] font-extrabold tracking-[0.18em] text-ink-2 uppercase">Coming soon</div>
+            <div className="text-[10px] font-extrabold tracking-[0.18em] text-ink-2 uppercase">
+              {localized(citiesCopy.comingSoonLabel)}
+            </div>
             {SOON.map((c) => (
               <div
                 key={c.name}

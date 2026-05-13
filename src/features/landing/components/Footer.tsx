@@ -1,47 +1,39 @@
 import { Camera, Video, MessageCircle, Globe } from 'lucide-react';
 
 import { Logo } from '@/components/layout/Logo';
+import { footer } from '@/content/landing/footer';
+import { localized } from '@/content';
 
 interface FooterProps {
   onScrollTo: (id: string) => void;
 }
 
-const LINKS = {
-  Product: [
-    { id: 'how', label: 'How it works' },
-    { id: 'makers', label: 'Makers' },
-    { id: 'cities', label: 'Cities' },
-  ],
-  Makers: [
-    { id: 'for-makers', label: 'For home cooks' },
-    { id: 'for-makers', label: 'FSSAI support' },
-    { id: 'for-makers', label: 'Earnings calculator' },
-  ],
-  Company: [
-    { id: 'story', label: 'Our story' },
-    { id: 'story', label: 'Press' },
-    { id: 'story', label: 'Careers' },
-  ],
-};
+const SOCIAL = [
+  { Icon: Camera, label: 'Instagram' },
+  { Icon: Video, label: 'YouTube' },
+  { Icon: MessageCircle, label: 'WhatsApp' },
+  { Icon: Globe, label: 'Web' },
+];
 
 export function Footer({ onScrollTo }: FooterProps) {
+  // Each column link either starts with "#" (scroll target) or is an absolute URL.
+  // For "#" links we use scrollTo; otherwise we'd render an <a href> — keep
+  // the navigation behaviour consistent with the previous implementation.
+  const handle = (href: string) => {
+    if (href.startsWith('#')) onScrollTo(href.slice(1));
+  };
+
   return (
     <footer className="border-t border-line bg-cream py-16">
       <div className="mx-auto max-w-page px-5 md:px-10">
         <div className="grid gap-10 md:grid-cols-5">
           <div className="md:col-span-2">
-            <Logo caption="घर से, घर तक" />
+            <Logo caption={localized(footer.tagline)} />
             <p className="mt-4 max-w-[320px] text-[12px] leading-relaxed text-ink-2">
-              Hyperlocal pre-order marketplace for home-made festival foods. Live in Sirsi, Karnataka. Built
-              with care.
+              {localized(footer.description)}
             </p>
             <div className="mt-6 flex items-center gap-3">
-              {[
-                { Icon: Camera, label: 'Instagram' },
-                { Icon: Video, label: 'YouTube' },
-                { Icon: MessageCircle, label: 'WhatsApp' },
-                { Icon: Globe, label: 'Web' },
-              ].map(({ Icon, label }) => (
+              {SOCIAL.map(({ Icon, label }) => (
                 <a
                   key={label}
                   href="#"
@@ -53,14 +45,16 @@ export function Footer({ onScrollTo }: FooterProps) {
               ))}
             </div>
           </div>
-          {Object.entries(LINKS).map(([heading, items]) => (
-            <div key={heading}>
-              <div className="mb-3 text-[10px] font-extrabold tracking-[0.18em] text-ink uppercase">{heading}</div>
+          {footer.columns.map((col, ci) => (
+            <div key={ci}>
+              <div className="mb-3 text-[10px] font-extrabold tracking-[0.18em] text-ink uppercase">
+                {localized(col.heading)}
+              </div>
               <ul className="space-y-2 text-[13px] text-ink-2">
-                {items.map((l, i) => (
+                {col.links.map((l, i) => (
                   <li key={i}>
-                    <button onClick={() => onScrollTo(l.id)} className="hover:text-ink">
-                      {l.label}
+                    <button onClick={() => handle(l.href)} className="hover:text-ink">
+                      {localized(l.label)}
                     </button>
                   </li>
                 ))}
@@ -69,20 +63,13 @@ export function Footer({ onScrollTo }: FooterProps) {
           ))}
         </div>
         <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-line pt-6 text-[11px] text-ink-2 md:flex-row">
-          <span>© 2026 Ghar Se · Made in Sirsi, Karnataka</span>
+          <span>{localized(footer.copyright)}</span>
           <div className="flex gap-4">
-            <a href="#" className="hover:text-ink">
-              Privacy
-            </a>
-            <a href="#" className="hover:text-ink">
-              Terms
-            </a>
-            <a href="#" className="hover:text-ink">
-              Refund policy
-            </a>
-            <a href="#" className="hover:text-ink">
-              FSSAI: 12345600002345
-            </a>
+            {footer.legalLinks.map((l, i) => (
+              <a key={i} href={l.href} className="hover:text-ink">
+                {localized(l.label)}
+              </a>
+            ))}
           </div>
         </div>
       </div>
