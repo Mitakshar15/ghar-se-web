@@ -1,53 +1,67 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Wallet, Lock, Shield, TrendingUp, ChefHat } from 'lucide-react';
+import { ArrowRight, Wallet, Lock, Shield, TrendingUp, ChefHat, type LucideIcon } from 'lucide-react';
 
 import { ROUTES } from '@/config/routes';
+import { forMakers } from '@/content/landing/for-makers';
+import { forMakersFineprint, localized } from '@/content';
 
-const BENEFITS = [
-  { Icon: Wallet, title: 'Earn ₹15K – ₹50K / month', body: 'Average maker earnings in year one.' },
-  { Icon: Lock, title: 'Direct bank payouts', body: 'Money in your account every 24-48 hours after delivery.' },
-  { Icon: Shield, title: 'We handle FSSAI', body: 'Free registration. Hygiene grading included.' },
-  { Icon: TrendingUp, title: 'Festival demand surges', body: 'Pre-orders 60 days out so you can plan and prep calmly.' },
-];
+const ICONS: Record<string, LucideIcon> = {
+  Wallet,
+  Lock,
+  Shield,
+  TrendingUp,
+};
 
 export function ForMakers() {
   const navigate = useNavigate();
+  const headlinePrefix = localized(forMakers.headlinePrefix);
+  // Headline split: prefix may contain a newline placeholder. Render literally.
+  const [headLine1, headLine2] = headlinePrefix.split('\n');
+
   return (
     <section id="for-makers" className="relative overflow-hidden py-20 md:py-32" style={{ background: '#171717' }}>
       <div className="dot-brass-bg absolute inset-0 opacity-30" />
       <div className="relative mx-auto max-w-page px-5 md:px-10">
         <div className="grid items-center gap-10 md:grid-cols-12 md:gap-16">
           <div className="md:col-span-7">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1.5"
-              style={{ background: 'rgba(200,160,77,0.15)', border: '1px solid rgba(200,160,77,0.25)' }}>
+            <div
+              className="mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1.5"
+              style={{ background: 'rgba(200,160,77,0.15)', border: '1px solid rgba(200,160,77,0.25)' }}
+            >
               <ChefHat className="size-3.5 text-brass" strokeWidth={2.5} />
-              <span className="text-[11px] font-extrabold tracking-[0.18em] text-brass uppercase">For home cooks</span>
+              <span className="text-[11px] font-extrabold tracking-[0.18em] text-brass uppercase">
+                {localized(forMakers.eyebrow)}
+              </span>
             </div>
             <h2 className="font-display text-[52px] leading-[1] font-black tracking-tight text-white md:text-[72px]">
-              Earn from your <br />
-              <span className="font-serif-italic text-brass">kitchen</span>.
+              {headLine1} {headLine2 && <br />}
+              <span className="font-serif-italic text-brass">{localized(forMakers.headlineItalic)}</span>.
             </h2>
             <p className="mt-5 max-w-[480px] text-[16px] leading-relaxed text-white/70">
-              The marketplace built for home cooks. Verified buyers, escrow payments, festival pre-orders, free
-              FSSAI registration. Keep cooking — we handle the rest.
+              {localized(forMakers.sub)}
             </p>
             <div className="mt-10 grid gap-5 sm:grid-cols-2">
-              {BENEFITS.map(({ Icon, title, body }) => (
-                <div key={title} className="flex items-start gap-3">
-                  <div className="flex size-10 flex-shrink-0 items-center justify-center rounded-xl"
-                    style={{ background: 'rgba(200,160,77,0.15)' }}>
-                    <Icon className="size-5 text-brass" strokeWidth={2.2} />
+              {forMakers.benefits.map((b) => {
+                const Icon = ICONS[b.iconName] ?? Wallet;
+                return (
+                  <div key={b.id} className="flex items-start gap-3">
+                    <div
+                      className="flex size-10 flex-shrink-0 items-center justify-center rounded-xl"
+                      style={{ background: 'rgba(200,160,77,0.15)' }}
+                    >
+                      <Icon className="size-5 text-brass" strokeWidth={2.2} />
+                    </div>
+                    <div>
+                      <div className="text-[14px] font-extrabold text-white">{localized(b.title)}</div>
+                      <div className="text-[12px] leading-relaxed text-white/60">{localized(b.body)}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-[14px] font-extrabold text-white">{title}</div>
-                    <div className="text-[12px] leading-relaxed text-white/60">{body}</div>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
               <button className="press inline-flex items-center justify-center gap-2 rounded-full bg-brass px-6 py-4 text-[14px] font-extrabold text-ink">
-                Apply to be a maker
+                {localized(forMakers.primaryCtaLabel)}
                 <ArrowRight className="size-4" strokeWidth={2.5} />
               </button>
               <button
@@ -55,16 +69,15 @@ export function ForMakers() {
                 className="press inline-flex items-center justify-center gap-2 rounded-full border-2 px-6 py-4 text-[14px] font-bold text-white"
                 style={{ borderColor: 'rgba(255,255,255,0.2)' }}
               >
-                Sign in to your kitchen
+                {localized(forMakers.secondaryCtaLabel)}
                 <ArrowRight className="size-4" strokeWidth={2.5} />
               </button>
             </div>
-            <p className="mt-4 text-[11px] text-white/40">
-              Free to join · ₹500 refundable security deposit · 8% commission · No subscription
-            </p>
+            <p className="mt-4 text-[11px] text-white/40">{forMakersFineprint()}</p>
           </div>
 
-          {/* Right column: stylised "dashboard" card */}
+          {/* Right column: stylised "dashboard" card — illustrative marketing,
+              not real data, so values stay inline. */}
           <div className="md:col-span-5">
             <div className="relative rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
               <div className="text-[10px] font-extrabold tracking-[0.18em] text-brass uppercase">This month</div>

@@ -13,6 +13,7 @@ import { API } from '@/lib/api/endpoints';
 import { qk } from '@/lib/api/queryClient';
 import { formatRupees } from '@/lib/utils/format';
 import { useToast } from '@/components/feedback/Toast';
+import { payoutWindowProse } from '@/content';
 import type { Order, OrderStatus } from '@/types/domain';
 
 /**
@@ -317,7 +318,7 @@ function OrderDetail({
         {order.status === 'delivered' && (
           <div className="py-2 text-center text-[12px] text-ink-2">
             <CheckCircle2 className="mx-auto mb-1 size-5 text-green" strokeWidth={2.4} />
-            Delivered. Payout will arrive in 24-48 hours.
+            Delivered. Payout will arrive in {payoutWindowProse()}.
           </div>
         )}
         {order.status === 'cancelled' && (

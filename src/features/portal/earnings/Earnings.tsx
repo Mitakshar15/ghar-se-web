@@ -11,6 +11,7 @@ import { apiGet } from '@/lib/api/client';
 import { API } from '@/lib/api/endpoints';
 import { qk } from '@/lib/api/queryClient';
 import { formatRupees } from '@/lib/utils/format';
+import { payoutWindowDisplay } from '@/content';
 import type { Payout } from '@/types/domain';
 
 interface EarningsResponse {
@@ -132,7 +133,7 @@ export function Earnings() {
 
           <Card padding="none">
             <div className="flex items-center justify-between p-6 pb-3">
-              <CardHeader title="Recent payouts" sub="Direct to bank · 24-48h after delivery" />
+              <CardHeader title="Recent payouts" sub={`Direct to bank · ${payoutWindowDisplay()}`} />
             </div>
             <table className="w-full">
               <thead>

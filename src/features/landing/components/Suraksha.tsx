@@ -1,12 +1,15 @@
-import { Shield, BadgeCheck, Lock, RotateCw, Award } from 'lucide-react';
+import { Shield, BadgeCheck, Lock, RotateCw, Award, type LucideIcon } from 'lucide-react';
 
-const PILLARS = [
-  { Icon: BadgeCheck, title: 'KYC verified makers', sub: 'Aadhaar + PAN linked. Real names, real kitchens.' },
-  { Icon: Shield, title: 'Hygiene grading', sub: 'In-person inspections. Public A+/A/B grade on every profile.' },
-  { Icon: Lock, title: 'Escrow payments', sub: 'Your money is held safely. Released only after you confirm delivery.' },
-  { Icon: RotateCw, title: '24-hour refund window', sub: 'Not happy? Full refund, no maker-side questions, no buyer-side haggling.' },
-  { Icon: Award, title: 'Tamper-evident packaging', sub: 'Every order sealed at the kitchen and again at handover.' },
-];
+import { suraksha } from '@/content/landing/suraksha';
+import { localized } from '@/content';
+
+const ICONS: Record<string, LucideIcon> = {
+  Shield,
+  BadgeCheck,
+  Lock,
+  RotateCw,
+  Award,
+};
 
 export function Suraksha() {
   return (
@@ -18,27 +21,30 @@ export function Suraksha() {
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brass/40 bg-brass/15 px-3 py-1.5">
               <Shield className="size-3.5 text-brass" strokeWidth={2.5} />
               <span className="text-[11px] font-extrabold tracking-[0.18em] text-brass uppercase">
-                Sirsi Suraksha
+                {localized(suraksha.eyebrow)}
               </span>
             </div>
             <h2 className="font-display text-[40px] leading-[1.05] font-black tracking-tight text-white md:text-[60px]">
-              Trust, <span className="font-serif-italic text-brass">built in.</span>
+              {localized(suraksha.headlinePrefix)}
+              <span className="font-serif-italic text-brass">{localized(suraksha.headlineItalic)}</span>
             </h2>
             <p className="mt-6 max-w-[420px] text-[15px] leading-relaxed text-white/70">
-              Five quiet promises that protect both buyer and maker. Not bolted on — written into how Ghar Se
-              works.
+              {localized(suraksha.sub)}
             </p>
           </div>
           <div className="grid gap-4 md:col-span-7 md:grid-cols-2">
-            {PILLARS.map(({ Icon, title, sub }) => (
-              <div key={title} className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
-                <div className="mb-3 flex size-10 items-center justify-center rounded-xl bg-brass/20">
-                  <Icon className="size-5 text-brass" strokeWidth={2.2} />
+            {suraksha.pillars.map((p) => {
+              const Icon = ICONS[p.iconName] ?? Shield;
+              return (
+                <div key={p.id} className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+                  <div className="mb-3 flex size-10 items-center justify-center rounded-xl bg-brass/20">
+                    <Icon className="size-5 text-brass" strokeWidth={2.2} />
+                  </div>
+                  <div className="text-[14px] font-extrabold text-white">{localized(p.title)}</div>
+                  <div className="mt-1 text-[12px] leading-relaxed text-white/60">{localized(p.sub)}</div>
                 </div>
-                <div className="text-[14px] font-extrabold text-white">{title}</div>
-                <div className="mt-1 text-[12px] leading-relaxed text-white/60">{sub}</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

@@ -40,6 +40,7 @@ Settled. Don't reopen without an explicit ask.
 - **Mock API:** MSW (Mock Service Worker) intercepting at the network layer. Toggleable via `VITE_USE_MOCKS`. Endpoints versioned (`/api/v1/...`) so the Spring Boot routes mirror cleanly.
 - **Icons:** `lucide-react`. Newer versions removed brand icons (Instagram/Twitter/etc.) — use generic stand-ins (Camera, Globe, MessageCircle).
 - **Fonts:** Fraunces (display), Inter (body), Instrument Serif italic (Hindi/Kannada accents). Loaded from Google Fonts via `<link>` in `index.html` with `preconnect`.
+- **Static content:** lives in `src/content/` as TypeScript modules validated by Zod at module load. Operational data lives behind the API. Business terms (commission %, deposit, lead times) live in `src/content/business/terms.ts` and are imported everywhere they're referenced. See [Rules → Static content](#static-content) below. Migration path: file-based CMS (Keystatic) when a marketing team forms; a headless CMS (Sanity) much later if content velocity justifies it.
 
 ## Project structure
 
@@ -93,6 +94,16 @@ gharse-web/
 │   │       ├── profile/Profile.tsx
 │   │       ├── settings/Settings.tsx
 │   │       └── help/Help.tsx
+│   ├── content/                      # Static content layer — see Rules → Static content
+│   │   ├── primitives/               # LocalizedString, DateWindow, CTA, AssetRef shapes
+│   │   ├── schema/                   # Zod schemas for landing/portal/business content blocks
+│   │   ├── landing/                  # Per-section content for the buyer landing
+│   │   ├── portal/                   # Portal copy (FAQs, trust pillars, settings labels)
+│   │   ├── business/terms.ts         # COMMISSION_PCT, SECURITY_DEPOSIT, etc. Single source of truth.
+│   │   ├── selectors.ts              # pickActive(now), localized(str, lang), daysUntil(iso)
+│   │   ├── selectors.test.ts         # Date-window + locale-fallback tests
+│   │   ├── index.ts                  # Re-exports — `import { content } from '@/content'`
+│   │   └── README.md                 # Authoring guide for the founder/marketing
 │   ├── mocks/
 │   │   ├── fixtures.ts               # Static seed data (maker, items, orders, reviews, payouts, …)
 │   │   ├── handlers.ts               # MSW request handlers for every /api/v1/* endpoint
@@ -174,6 +185,44 @@ gharse-web/
 - **All client config goes through `src/config/env.ts`.** It's Zod-validated and bails on misconfig. Add new keys here AND `.env.example` in lockstep.
 - **Feature flags via `VITE_FEATURE_*`** env vars, never via runtime DB. We aren't there yet.
 
+### Static content {#static-content}
+
+The rule is simple: **operational data lives in the API, marketing copy lives in `src/content/`, business terms live in `src/content/business/terms.ts` and are imported (never re-typed) everywhere they appear.**
+
+What that means in practice:
+
+- **No copy in components.** Headlines, subheads, button labels, FAQ entries, testimonials, marquee items, festival banners — none of it belongs hardcoded in JSX. Components are renderers; content is data.
+- **One source of truth per concept.** A testimonial appears in exactly one content file. A FAQ answer lives in one place. The 8% commission figure is `BUSINESS.commissionPct` from `business/terms.ts` — never a hardcoded "8%" anywhere else (not in a hero subhead, not in a FAQ answer, not in a maker-onboarding screen).
+- **Schemas are the contract.** Every content block has a Zod schema in `content/schema/`. Content modules `.parse()` their data at module load. Bad content fails the build, not production.
+- **Localization-ready by default.** All user-visible strings use the `LocalizedString` shape (`{ en, kn?, hi? }`). We ship English today; the shape is locked so adding Kannada later is filling in fields, not refactoring components.
+- **Dates are content too.** Festival campaigns, seasonal marquee strips, sale banners all use `DateWindow` (`activeFrom`/`activeUntil`). The render path uses `pickActive(now)` to surface what's live. Countdowns ("119 days to Ganesh Chaturthi") are render-time calculations against `festivalDate`, not stored strings — they tick daily without any deploy.
+- **Operational data does not belong in content.** Maker counts, payouts paid, cities live, ratings — these flow from the API. They change because the world changes, not because someone wrote new copy.
+- **Component refactor pattern:** when you see inline copy in a component, extract it. The component should accept content as data (either as a prop or by importing from `src/content/`), and use selectors (`localized()`, `pickActive()`) to render it.
+
+When the founder needs to ship a new banner / change copy / launch a festival campaign, the workflow is:
+
+1. Edit the relevant file in `src/content/`. Almost always a TS file with a typed array literal.
+2. Commit, push, get a preview deploy, review.
+3. Merge to main, the static build deploys.
+
+What lives in `src/content/` (current and planned):
+
+- **`primitives/`** — atomic types: `LocalizedString`, `DateWindow`, `CTA`, `AssetRef`. Every content file builds on these.
+- **`schema/`** — Zod schemas. The contract for each block. `landing.ts`, `portal.ts`, `business.ts`.
+- **`landing/`** — buyer-facing copy: hero, how-it-works, suraksha, festival-campaigns, marquee, for-makers, numbers-copy, cities-copy, testimonials, download-cta, footer.
+- **`portal/`** — maker portal copy: FAQs, trust pillars, settings labels.
+- **`business/terms.ts`** — `COMMISSION_PCT`, `SECURITY_DEPOSIT_INR`, `PAYOUT_WINDOW_HOURS`, `PLUS_YEARLY_INR`, etc. Imported everywhere; never duplicated.
+- **`selectors.ts`** — pure functions: `pickActive(items, now)`, `localized(str, lang)`, `daysUntil(iso)`.
+- **`README.md`** — the authoring guide. Read it before editing anything in `content/`.
+
+When this layer scales out of TS files (likely 12+ months from now, when there's a real marketing team):
+
+- **Next step:** Keystatic — a file-based CMS that reads/writes the same `src/content/*` files via a web UI. Same shapes, same git history, no migration. ~1 day of setup.
+- **Step after that, if content velocity justifies it:** Sanity (best free tier, India-friendly CDN, structured content) — copy the Zod schemas into Sanity's schema definition format and migrate.
+- **What we will not do:** build a custom admin panel in Spring Boot. That's a graveyard project.
+
+If you find yourself adding inline copy to a component, stop. Extract it to `src/content/` with the right schema, even if it's just one string. The discipline pays compounding interest.
+
 ## Build & dev commands
 
 ```bash
@@ -207,7 +256,10 @@ VITE_USE_MOCKS=false VITE_API_BASE_URL=https://api.gharse.com npm run dev
 | Founder says | What it usually means |
 |---|---|
 | "Add a section to the portal" | New folder in `src/features/portal/<name>/`, new route in `config/routes.ts`, new sidebar entry in `PortalShell`, new MSW handler. Don't shove it into an existing file. |
-| "Make the homepage section X feel like Y" | Edit the matching file in `src/features/landing/components/`. Don't touch portal code. |
+| "Make the homepage section X feel like Y" | Edit the matching file in `src/features/landing/components/` for layout, OR `src/content/landing/<section>.ts` for copy. Don't touch portal code. |
+| "Change the testimonial / FAQ / hero copy / banner" | Edit the matching file in `src/content/`. Don't go hunting through components. If you can't find it in `src/content/`, that's a bug — extract it from the component first. |
+| "Launch a festival banner / season campaign" | Add a dated entry to `src/content/landing/festival-campaigns.ts` (or the relevant date-windowed file). `activeFrom`/`activeUntil` decide when it shows. No component changes. |
+| "Change the commission % / deposit / payout window" | Edit `src/content/business/terms.ts`. Every component that references it picks up the change. Never grep-replace literals. |
 | "Wire up the real API" | Set `VITE_USE_MOCKS=false`, point `VITE_API_BASE_URL` at the Spring Boot host. Verify each endpoint in `src/mocks/handlers.ts` is implemented server-side with the same shape. |
 | "Keep the previous design" | Restore exactly. Don't reinterpret. |
 | "Refine X" | Spacing, hierarchy, polish. NOT a redesign. |
