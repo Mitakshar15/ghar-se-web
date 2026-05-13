@@ -38,6 +38,12 @@ export const payoutWindowDisplay = (): string => {
   return `${min}-${max}h after delivery`;
 };
 
+/** Prose form: "24-48 hours". Used in FAQ answers and longer copy. */
+export const payoutWindowProse = (): string => {
+  const { min, max } = BUSINESS.payoutWindowHours;
+  return `${min}-${max} hours`;
+};
+
 export const refundWindowDisplay = (): string => `${BUSINESS.refundWindowHours}-hour refund window`;
 
 export const plusYearlyDisplay = (): string => `₹${BUSINESS.plusYearlyInr}/year`;

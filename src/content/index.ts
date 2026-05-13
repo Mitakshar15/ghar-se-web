@@ -19,6 +19,7 @@ export {
   commissionDisplay,
   securityDepositDisplay,
   payoutWindowDisplay,
+  payoutWindowProse,
   refundWindowDisplay,
   plusYearlyDisplay,
   forMakersFineprint,

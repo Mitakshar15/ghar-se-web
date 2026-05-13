@@ -4,13 +4,20 @@ import { Phone, Mail, Smartphone, ChevronDown, ArrowRight } from 'lucide-react';
 import { PortalShell } from '@/components/layout/PortalShell';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { BUSINESS, payoutWindowProse } from '@/content';
 
+/**
+ * FAQ copy will move to src/content/portal/faqs.ts in a later PR. For now,
+ * the questions/answers stay here; the only thing we extract right now is
+ * the embedded business-term values (commission %, payout window) so a
+ * change in business/terms.ts propagates to the FAQ automatically.
+ */
 const FAQS = [
-  { q: 'When will I get paid for an order?', a: 'Your payout is released 24–48 hours after the buyer confirms delivery. You can change your payout cadence in Settings → Payouts.' },
+  { q: 'When will I get paid for an order?', a: `Your payout is released ${payoutWindowProse()} after the buyer confirms delivery. You can change your payout cadence in Settings → Payouts.` },
   { q: 'A buyer is asking me to cancel — what do I do?', a: "Politely ask them to cancel from their app (Orders → Cancel). Don't cancel from your end unless absolutely necessary — frequent cancellations from makers hurt your rating. If they refuse, message support and we'll handle it." },
   { q: 'Can I increase my daily capacity temporarily for a festival?', a: 'Yes. Go to Calendar → tap the festival day → raise capacity. Pre-orders for big festivals also get a separate quota you can set.' },
   { q: 'I made a mistake on an order. Can I edit it?', a: 'After confirmation, items and amounts are locked to protect the buyer. Message the buyer through the order — most accept small adjustments amicably.' },
-  { q: 'Why does Ghar Se take 8% commission?', a: 'It funds buyer acquisition, payment processing, refunds when something goes wrong, and your FSSAI / hygiene support. We are intentionally far below Swiggy / Zomato (20–30%).' },
+  { q: `Why does Ghar Se take ${BUSINESS.commissionPct}% commission?`, a: `It funds buyer acquisition, payment processing, refunds when something goes wrong, and your FSSAI / hygiene support. We are intentionally far below Swiggy / Zomato (20–30%).` },
   { q: "What happens if a buyer doesn't accept the delivery?", a: 'Money stays in escrow. We try to redeliver. If unresolved within 48h, the order is refunded to the buyer and the items are written off — Ghar Se absorbs the cost for your first two such incidents per year.' },
   { q: 'My FSSAI is expiring. What do I do?', a: 'We auto-remind you 90, 30 and 7 days before. Tap Profile → Verification → Schedule renewal. Free for makers who renew via Ghar Se.' },
   { q: 'How do I add a helper to my kitchen account?', a: 'Settings → Helpers → Add. Helpers can view orders and update prep status but cannot change your menu, prices, or bank details.' },

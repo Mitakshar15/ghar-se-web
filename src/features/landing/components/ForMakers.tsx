@@ -2,11 +2,14 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Wallet, Lock, Shield, TrendingUp, ChefHat } from 'lucide-react';
 
 import { ROUTES } from '@/config/routes';
+import { forMakersFineprint, payoutWindowProse } from '@/content';
 
+// Benefit copy is mostly stable; the one line that references a business term
+// (the payout-window) pulls from the canonical source so it stays in sync.
 const BENEFITS = [
   { Icon: Wallet, title: 'Earn ₹15K – ₹50K / month', body: 'Average maker earnings in year one.' },
-  { Icon: Lock, title: 'Direct bank payouts', body: 'Money in your account every 24-48 hours after delivery.' },
-  { Icon: Shield, title: 'We handle FSSAI', body: 'Free registration. Hygiene grading included.' },
+  { Icon: Lock,   title: 'Direct bank payouts',      body: `Money in your account every ${payoutWindowProse()} after delivery.` },
+  { Icon: Shield, title: 'We handle FSSAI',          body: 'Free registration. Hygiene grading included.' },
   { Icon: TrendingUp, title: 'Festival demand surges', body: 'Pre-orders 60 days out so you can plan and prep calmly.' },
 ];
 
@@ -59,9 +62,7 @@ export function ForMakers() {
                 <ArrowRight className="size-4" strokeWidth={2.5} />
               </button>
             </div>
-            <p className="mt-4 text-[11px] text-white/40">
-              Free to join · ₹500 refundable security deposit · 8% commission · No subscription
-            </p>
+            <p className="mt-4 text-[11px] text-white/40">{forMakersFineprint()}</p>
           </div>
 
           {/* Right column: stylised "dashboard" card */}
