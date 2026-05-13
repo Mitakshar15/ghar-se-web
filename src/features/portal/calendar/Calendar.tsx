@@ -1,11 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ChevronLeft, ChevronRight, Plus, ShoppingBag, ChefHat, Sparkles, Flame } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 
 import { PortalShell } from '@/components/layout/PortalShell';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { StatTile } from '@/components/ui/StatTile';
 import { apiGet, apiPatch } from '@/lib/api/client';
 import { API } from '@/lib/api/endpoints';
 import { qk } from '@/lib/api/queryClient';
@@ -80,7 +79,19 @@ export function CalendarPage() {
       <div className="space-y-5">
         <CardHeader
           title="Calendar"
-          sub="Set how many orders you can take each day. Block days off, mark festivals, plan ahead."
+          sub={
+            <span className="text-[13px] text-ink-2">
+              <span className="font-extrabold text-ink">{totalMonthOrders}</span> orders this month
+              <span className="mx-2 text-ink-3">·</span>
+              max <span className="font-extrabold text-ink">{data?.dailyCap ?? 15}</span>/day
+              <span className="mx-2 text-ink-3">·</span>
+              <span className="font-extrabold text-ink">{Object.keys(data?.festivals ?? {}).length}</span>{' '}
+              festival{Object.keys(data?.festivals ?? {}).length === 1 ? '' : 's'}
+              <span className="mx-2 text-ink-3">·</span>
+              <span className={`font-extrabold ${monthFull > 0 ? 'text-danger' : 'text-ink'}`}>{monthFull}</span> full
+              days
+            </span>
+          }
           action={
             <Button
               variant="primary"
@@ -92,13 +103,6 @@ export function CalendarPage() {
             </Button>
           }
         />
-
-        <div className="grid gap-4 md:grid-cols-4">
-          <StatTile label="This month" value={totalMonthOrders} sub="orders so far" icon={ShoppingBag} />
-          <StatTile label="Daily capacity" value={data?.dailyCap ?? 15} sub="orders / day max" icon={ChefHat} tone="saffron" />
-          <StatTile label="Festival days" value={Object.keys(data?.festivals ?? {}).length} sub={monthName} icon={Sparkles} tone="brass" />
-          <StatTile label="Full days" value={monthFull} sub=">90% booked" icon={Flame} tone="danger" />
-        </div>
 
         <div className="grid gap-5 lg:grid-cols-3">
           <Card className="lg:col-span-2">
