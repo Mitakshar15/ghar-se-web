@@ -10,7 +10,6 @@ import {
   User,
   Settings,
   HelpCircle,
-  Bell,
   LogOut,
   Menu as MenuIcon,
   X,
@@ -24,6 +23,7 @@ import { useToast } from '@/components/feedback/Toast';
 import { apiPost } from '@/lib/api/client';
 import { API } from '@/lib/api/endpoints';
 import { Logo } from './Logo';
+import { NotificationsBell } from './NotificationsBell';
 import { cn } from '@/lib/utils/cn';
 
 interface NavItem {
@@ -192,12 +192,7 @@ export function PortalShell({ children, topbarKicker, pageTitle }: PortalShellPr
               {pageTitle ?? current?.label ?? 'Portal'}
             </h1>
           </div>
-          <button className="relative flex size-10 items-center justify-center rounded-full bg-canvas-2 press">
-            <Bell className="size-5 text-ink" strokeWidth={2.2} />
-            <span className="absolute -top-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-saffron text-[9px] font-bold text-white">
-              4
-            </span>
-          </button>
+          <NotificationsBell />
           {maker && (
             <div className="ml-2 hidden items-center gap-2 border-l border-line pl-4 md:flex">
               <div className="text-right">

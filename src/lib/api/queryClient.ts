@@ -22,6 +22,7 @@ export const queryClient = new QueryClient({
 export const qk = {
   me: ['me'] as const,
   dashboard: ['dashboard'] as const,
+  notifications: ['notifications'] as const,
   orders: (status?: string) => ['orders', status ?? 'all'] as const,
   menu: ['menu'] as const,
   calendar: (year: number, month: number) => ['calendar', year, month] as const,
