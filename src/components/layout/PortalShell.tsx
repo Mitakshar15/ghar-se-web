@@ -29,26 +29,34 @@ import { cn } from '@/lib/utils/cn';
 interface NavItem {
   to: string;
   label: string;
-  sub: string;
   icon: LucideIcon;
   badge?: number;
 }
 
-const NAV: NavItem[] = [
-  { to: ROUTES.dashboard, label: 'Dashboard', sub: 'At-a-glance', icon: Home },
-  { to: ROUTES.orders, label: 'Orders', sub: 'Confirm & prepare', icon: ShoppingBag, badge: 3 },
-  { to: ROUTES.menu, label: 'Menu', sub: 'Items & prices', icon: ChefHat },
-  { to: ROUTES.calendar, label: 'Calendar', sub: 'Daily capacity', icon: Calendar },
-  { to: ROUTES.earnings, label: 'Earnings', sub: 'Payouts & breakdown', icon: Wallet },
-  { to: ROUTES.reviews, label: 'Reviews', sub: 'Customer feedback', icon: Star },
-  { to: ROUTES.profile, label: 'Profile', sub: 'Kitchen & KYC', icon: User },
-  { to: ROUTES.settings, label: 'Settings', sub: 'Notifications & holidays', icon: Settings },
-  { to: ROUTES.help, label: 'Help', sub: 'FAQ & contact', icon: HelpCircle },
+// Primary destinations — the daily/weekly work surface. Order matters: it's
+// the reading order Sushma aunty's eye follows down the rail.
+const PRIMARY_NAV: NavItem[] = [
+  { to: ROUTES.dashboard, label: 'Today', icon: Home },
+  { to: ROUTES.orders, label: 'Orders', icon: ShoppingBag, badge: 3 },
+  { to: ROUTES.menu, label: 'Menu', icon: ChefHat },
+  { to: ROUTES.calendar, label: 'Calendar', icon: Calendar },
+  { to: ROUTES.earnings, label: 'Earnings', icon: Wallet },
 ];
+
+// Occasional / admin destinations — same sidebar, visually de-emphasized
+// under a "More" group so they don't compete with primary work.
+const MORE_NAV: NavItem[] = [
+  { to: ROUTES.reviews, label: 'Reviews', icon: Star },
+  { to: ROUTES.profile, label: 'Profile', icon: User },
+  { to: ROUTES.settings, label: 'Settings', icon: Settings },
+  { to: ROUTES.help, label: 'Help', icon: HelpCircle },
+];
+
+const ALL_NAV = [...PRIMARY_NAV, ...MORE_NAV];
 
 interface PortalShellProps {
   children: ReactNode;
-  /** Header sub-label shown above the page title in the top bar */
+  /** Optional small kicker line above the page title in the topbar */
   topbarKicker?: string;
   /** Page title — defaults to the matched route's label */
   pageTitle?: string;
@@ -61,7 +69,7 @@ export function PortalShell({ children, topbarKicker, pageTitle }: PortalShellPr
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const current = NAV.find((n) => location.pathname.startsWith(n.to));
+  const current = ALL_NAV.find((n) => location.pathname.startsWith(n.to));
 
   const handleSignOut = async () => {
     try {
@@ -127,49 +135,27 @@ export function PortalShell({ children, topbarKicker, pageTitle }: PortalShellPr
         )}
 
         <nav className="relative flex-1 overflow-y-auto py-4">
-          {NAV.map((n) => {
-            const Icon = n.icon;
-            return (
-              <NavLink
-                key={n.to}
-                to={n.to}
-                onClick={() => setMobileOpen(false)}
-                className={({ isActive }) =>
-                  cn(
-                    'flex items-center gap-3 px-5 py-2.5 press text-left',
-                    isActive
-                      ? 'border-l-[3px] border-brass bg-[rgba(200,160,77,0.12)]'
-                      : 'border-l-[3px] border-transparent',
-                  )
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <Icon
-                      className={cn('size-4 flex-shrink-0', isActive ? 'text-brass' : 'text-white/70')}
-                      strokeWidth={2.2}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div
-                        className={cn(
-                          'text-[13px] font-extrabold',
-                          isActive ? 'text-white' : 'text-white/80',
-                        )}
-                      >
-                        {n.label}
-                      </div>
-                      <div className="text-[10px] text-white/40">{n.sub}</div>
-                    </div>
-                    {n.badge !== undefined && (
-                      <span className="flex size-5 items-center justify-center rounded-full bg-saffron text-[9px] font-extrabold text-white">
-                        {n.badge}
-                      </span>
-                    )}
-                  </>
-                )}
-              </NavLink>
-            );
-          })}
+          {PRIMARY_NAV.map((n) => (
+            <SidebarItem
+              key={n.to}
+              item={n}
+              onClick={() => setMobileOpen(false)}
+            />
+          ))}
+
+          {/* "More" group — same sidebar, visually de-emphasized so it doesn't
+              compete with primary work. Reviews / Profile / Settings / Help live here. */}
+          <div className="mt-6 px-5 pt-5 border-t border-white/10">
+            <div className="text-[10px] font-extrabold tracking-[0.16em] text-white/40 uppercase">More</div>
+          </div>
+          {MORE_NAV.map((n) => (
+            <SidebarItem
+              key={n.to}
+              item={n}
+              dim
+              onClick={() => setMobileOpen(false)}
+            />
+          ))}
         </nav>
 
         <div className="relative border-t border-white/10 p-5">
@@ -197,9 +183,11 @@ export function PortalShell({ children, topbarKicker, pageTitle }: PortalShellPr
             <MenuIcon className="size-5 text-ink" strokeWidth={2.2} />
           </button>
           <div className="min-w-0 flex-1">
-            <div className="text-[10px] font-extrabold tracking-[0.16em] text-ink-2 uppercase">
-              {topbarKicker ?? current?.sub}
-            </div>
+            {topbarKicker && (
+              <div className="text-[10px] font-extrabold tracking-[0.16em] text-ink-2 uppercase">
+                {topbarKicker}
+              </div>
+            )}
             <h1 className="font-display truncate text-[22px] leading-tight font-black tracking-tight text-ink">
               {pageTitle ?? current?.label ?? 'Portal'}
             </h1>
@@ -226,5 +214,52 @@ export function PortalShell({ children, topbarKicker, pageTitle }: PortalShellPr
         <main className="w-full max-w-page flex-1 px-5 py-8 md:px-10">{children}</main>
       </div>
     </div>
+  );
+}
+
+/**
+ * A single sidebar nav entry. `dim` variant is used for the "More" group so
+ * those items render quieter than primary destinations.
+ */
+function SidebarItem({ item, onClick, dim = false }: { item: NavItem; onClick: () => void; dim?: boolean }) {
+  const Icon = item.icon;
+  return (
+    <NavLink
+      to={item.to}
+      onClick={onClick}
+      className={({ isActive }) =>
+        cn(
+          'flex items-center gap-3 px-5 py-2.5 press text-left',
+          isActive
+            ? 'border-l-[3px] border-brass bg-[rgba(200,160,77,0.12)]'
+            : 'border-l-[3px] border-transparent',
+        )
+      }
+    >
+      {({ isActive }) => (
+        <>
+          <Icon
+            className={cn(
+              'size-4 flex-shrink-0',
+              isActive ? 'text-brass' : dim ? 'text-white/40' : 'text-white/70',
+            )}
+            strokeWidth={2.2}
+          />
+          <span
+            className={cn(
+              'flex-1 text-[13px] font-extrabold',
+              isActive ? 'text-white' : dim ? 'text-white/60' : 'text-white/85',
+            )}
+          >
+            {item.label}
+          </span>
+          {item.badge !== undefined && (
+            <span className="flex size-5 items-center justify-center rounded-full bg-saffron text-[9px] font-extrabold text-white">
+              {item.badge}
+            </span>
+          )}
+        </>
+      )}
+    </NavLink>
   );
 }
