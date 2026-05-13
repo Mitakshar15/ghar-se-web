@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { TrendingUp, FileText } from 'lucide-react';
+import { TrendingUp, FileText, ChevronDown } from 'lucide-react';
 
 import { PortalShell } from '@/components/layout/PortalShell';
 import { Card, CardHeader } from '@/components/ui/Card';
@@ -22,6 +23,10 @@ interface EarningsResponse {
 const COLORS = ['#0B5D4D', '#F25F0C', '#C8A04D', '#147A66'];
 
 export function Earnings() {
+  // The category breakdown is a once-a-month curiosity, not a daily need.
+  // Default closed; maker can open it when she wants to dig in.
+  const [breakdownOpen, setBreakdownOpen] = useState(false);
+
   const { data, isLoading } = useQuery({
     queryKey: qk.earnings,
     queryFn: () => apiGet<EarningsResponse>(API.earnings),
@@ -35,7 +40,6 @@ export function Earnings() {
         <div className="space-y-5">
           <CardHeader
             title="Earnings"
-            sub="Payouts, breakdown, and your bank details. Direct to your bank in 24-48h after delivery."
             action={
               <Button variant="outline" size="md" leftIcon={<FileText className="size-3.5" strokeWidth={2.5} />}>
                 Download statement
@@ -43,48 +47,68 @@ export function Earnings() {
             }
           />
 
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card padding="none" className="overflow-hidden md:col-span-1">
-              <div
-                className="relative p-6 text-white"
-                style={{ background: 'linear-gradient(135deg, #0B5D4D 0%, #063C32 100%)' }}
-              >
-                <div className="dot-light-bg absolute inset-0 opacity-30" />
-                <div className="relative">
-                  <div className="mb-1 text-[11px] font-extrabold tracking-[0.16em] text-white/70 uppercase">
-                    This month
-                  </div>
-                  <div className="font-display text-[36px] leading-none font-black tracking-tight">
-                    {formatRupees(data.summary.thisMonth)}
-                  </div>
-                  <div className="mt-2 flex items-center gap-1.5 text-[12px]">
-                    <TrendingUp className="size-3.5" strokeWidth={2.5} />
-                    <span className="font-extrabold">+{data.summary.lastMonthDelta}%</span>
-                    <span className="opacity-80">vs April</span>
-                  </div>
+          {/* Hero: this month + paid out + scheduled. Full width — this is the
+              actual money-related answer the maker is here for. */}
+          <Card padding="none" className="overflow-hidden">
+            <div
+              className="relative p-6 text-white"
+              style={{ background: 'linear-gradient(135deg, #0B5D4D 0%, #063C32 100%)' }}
+            >
+              <div className="dot-light-bg absolute inset-0 opacity-30" />
+              <div className="relative">
+                <div className="mb-1 text-[11px] font-extrabold tracking-[0.16em] text-white/70 uppercase">
+                  This month
+                </div>
+                <div className="font-display text-[40px] leading-none font-black tracking-tight">
+                  {formatRupees(data.summary.thisMonth)}
+                </div>
+                <div className="mt-2 flex items-center gap-1.5 text-[13px]">
+                  <TrendingUp className="size-4" strokeWidth={2.5} />
+                  <span className="font-extrabold">+{data.summary.lastMonthDelta}%</span>
+                  <span className="opacity-80">vs April</span>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4 p-5">
-                <div>
-                  <div className="text-[10px] font-extrabold tracking-wider text-ink-2 uppercase">Paid out</div>
-                  <div className="font-display mt-1 text-[18px] font-black tracking-tight text-ink">
-                    {formatRupees(data.summary.paidOut)}
-                  </div>
-                  <div className="text-[10px] text-ink-2">via {data.bank.name}</div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 p-5 md:grid-cols-2">
+              <div>
+                <div className="text-[10px] font-extrabold tracking-wider text-ink-2 uppercase">Paid out</div>
+                <div className="font-display mt-1 text-[18px] font-black tracking-tight text-ink">
+                  {formatRupees(data.summary.paidOut)}
                 </div>
-                <div>
-                  <div className="text-[10px] font-extrabold tracking-wider text-ink-2 uppercase">Scheduled</div>
-                  <div className="font-display mt-1 text-[18px] font-black tracking-tight text-saffron">
-                    {formatRupees(data.summary.scheduled)}
-                  </div>
-                  <div className="text-[10px] text-ink-2">arrives tomorrow</div>
-                </div>
+                <div className="text-[10px] text-ink-2">via {data.bank.name}</div>
               </div>
-            </Card>
+              <div>
+                <div className="text-[10px] font-extrabold tracking-wider text-ink-2 uppercase">Scheduled</div>
+                <div className="font-display mt-1 text-[18px] font-black tracking-tight text-saffron">
+                  {formatRupees(data.summary.scheduled)}
+                </div>
+                <div className="text-[10px] text-ink-2">arrives tomorrow</div>
+              </div>
+            </div>
+          </Card>
 
-            <Card className="md:col-span-2">
-              <CardHeader title="Where your earnings came from" sub="May 2026 · by category" />
-              <div className="space-y-3">
+          {/* Breakdown — collapsed by default. Click to expand. */}
+          <Card padding="none">
+            <button
+              onClick={() => setBreakdownOpen((v) => !v)}
+              className="press flex w-full items-center justify-between p-5 text-left hover:bg-canvas-2"
+              aria-expanded={breakdownOpen}
+            >
+              <div>
+                <div className="text-[10px] font-extrabold tracking-[0.16em] text-ink-2 uppercase">
+                  This month
+                </div>
+                <div className="font-display text-[18px] font-black tracking-tight text-ink">
+                  Where did this money come from?
+                </div>
+              </div>
+              <ChevronDown
+                className={`size-5 text-ink-2 transition-transform ${breakdownOpen ? 'rotate-180' : ''}`}
+                strokeWidth={2.4}
+              />
+            </button>
+            {breakdownOpen && (
+              <div className="space-y-3 border-t border-line p-5 animate-fade-in">
                 {data.breakdown.map((b, i) => (
                   <div key={b.label}>
                     <div className="mb-1 flex items-center justify-between">
@@ -103,8 +127,8 @@ export function Earnings() {
                   </div>
                 ))}
               </div>
-            </Card>
-          </div>
+            )}
+          </Card>
 
           <Card padding="none">
             <div className="flex items-center justify-between p-6 pb-3">

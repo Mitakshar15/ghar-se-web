@@ -9,6 +9,7 @@ export const API = {
   authMe: '/api/v1/auth/me',
 
   dashboard: '/api/v1/portal/dashboard',
+  notifications: '/api/v1/notifications',
 
   orders: '/api/v1/orders',
   order: (id: string) => `/api/v1/orders/${id}`,

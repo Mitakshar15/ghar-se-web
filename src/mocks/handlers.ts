@@ -62,6 +62,12 @@ export const handlers = [
     return HttpResponse.json(data.maker);
   }),
 
+  // ---- Notifications (shared across portal — bell dropdown) ----
+  http.get(`${BASE}/notifications`, async () => {
+    await lag();
+    return HttpResponse.json({ notifications: data.notifications });
+  }),
+
   // ---- Dashboard ----
   http.get(`${BASE}/portal/dashboard`, async () => {
     await lag();
