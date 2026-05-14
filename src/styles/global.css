@@ -21,6 +21,48 @@
   .press {
     @apply transition-transform duration-100 active:scale-[0.97];
   }
+
+  /* Floating-card hover animations — gentle vertical drift, used on the
+     three UI fragment cards overlapping the Hero phone mockup. */
+  @keyframes float-slow {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0);
+    }
+    50% {
+      transform: translateY(-10px) rotate(1deg);
+    }
+  }
+  @keyframes float-slow-rev {
+    0%,
+    100% {
+      transform: translateY(0) rotate(0);
+    }
+    50% {
+      transform: translateY(8px) rotate(-1deg);
+    }
+  }
+  .ani-float {
+    animation: float-slow 6s ease-in-out infinite;
+  }
+  .ani-float-rev {
+    animation: float-slow-rev 7s ease-in-out infinite;
+  }
+  /* Pulse used by the eyebrow live-dot. */
+  @keyframes pulse-soft {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(1.15);
+    }
+  }
+  .ani-pulse-soft {
+    animation: pulse-soft 1.8s ease-in-out infinite;
+  }
   .hover-lift {
     @apply transition-[transform,box-shadow] duration-300;
   }

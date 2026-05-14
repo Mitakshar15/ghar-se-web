@@ -18,15 +18,56 @@ export const HeroSupportingCardSchema = z.object({
   label: LocalizedStringSchema,
 });
 
+/**
+ * A small white card that floats over the phone mockup (e.g. "₹460 in escrow ·
+ * Safe till delivery"). Position is decided by the component — content carries
+ * the copy, the icon name, and the tone.
+ */
+export const HeroFloatingCardSchema = z.object({
+  id: z.string(),
+  iconName: z.string(),
+  tone: z.enum(['green', 'saffron', 'brass']),
+  title: LocalizedStringSchema,
+  sub: LocalizedStringSchema,
+  /**
+   * Optional "verified maker"-style card with a featured emoji and a star
+   * rating chip. When set, the floating card renders the maker variant
+   * instead of the icon-+-text variant. We only support one maker variant
+   * at a time today.
+   */
+  maker: z
+    .object({
+      emoji: z.string(),
+      emojiBg: z.string(),
+      rating: z.number(),
+      distance: LocalizedStringSchema,
+    })
+    .optional(),
+});
+export type HeroFloatingCard = z.infer<typeof HeroFloatingCardSchema>;
+
 export const HeroContentSchema = z.object({
   eyebrow: LocalizedStringSchema,
+  /** Ornamental Hindi/Kannada accent shown next to the eyebrow pill. */
+  eyebrowAccent: LocalizedStringSchema.optional(),
   // Headline is split into two parts so we can underline the second word in JSX.
   headlinePrefix: LocalizedStringSchema,
   headlineUnderlined: LocalizedStringSchema,
   sub: LocalizedStringSchema,
   primaryCtas: z.array(CTASchema).min(1).max(3),
+  /** Emoji avatars overlapping behind the star rating in the social-proof row. */
+  socialAvatars: z.array(z.string()).max(8).optional(),
   socialProof: LocalizedStringSchema,
+  /** Rating value (string) and review count text shown next to the avatars. */
+  socialRating: z
+    .object({
+      stars: z.number().int().min(1).max(5),
+      score: z.string(),
+    })
+    .optional(),
   supportingCards: z.array(HeroSupportingCardSchema).max(5),
+  /** Floating UI fragment cards that overlap the phone mockup on the right. */
+  floatingCards: z.array(HeroFloatingCardSchema).max(4).optional(),
 });
 export type HeroContent = z.infer<typeof HeroContentSchema>;
 
