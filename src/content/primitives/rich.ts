@@ -9,6 +9,11 @@ import { LocalizedStringSchema } from './locale';
  */
 export const CTASchema = z.object({
   label: LocalizedStringSchema,
+  /**
+   * Optional secondary line above the main label — used for two-line app-store
+   * buttons ("Download on" / "App Store"). Components decide whether to render.
+   */
+  subLabel: LocalizedStringSchema.optional(),
   href: z.string(),
   variant: z.enum(['primary', 'saffron', 'outline', 'ghost']).optional(),
 });
